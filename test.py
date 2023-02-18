@@ -2,9 +2,9 @@ import cv2
 import buildStateTemplates as st
 import licensePlateRecognition as pr
 
-num_tests = [3, 3, 3, 6, 23, 4, 29, 14, 5, 4,
+num_tests = [3, 6, 3, 6, 23, 4, 29, 14, 5, 4,
     3, 13, 3, 2, 1, 1, 4, 3, 5, 3, 14,
-    4, 12, 1, 5, 4, 2, 20, 13, 5, 3,
+    4, 12, 1, 4, 4, 2, 20, 13, 5, 3,
     4, 4, 3, 1, 1, 4, 9, 4, 2,
     1, 9, 2, 2, 7, 2, 4, 23, 3, 3]
 
