@@ -1,7 +1,6 @@
 import datetime
 
 import pytesseract
-import self as self
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"  # your path may be different
 import cv2

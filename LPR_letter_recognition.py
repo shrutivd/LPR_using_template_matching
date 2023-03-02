@@ -8,6 +8,11 @@ def buildTemplates():
 
     return character_templates
 
+def getCharacterLocation(keypoints,matches):
+    array = []
+    for match in matches:
+        array.append([keypoints[match].pt[0],keypoints[match].pt[1]])
+    return np.mean(array,axis=0)[0]
 
 def findCharacter(img, character_templates):
     img_features = lt.extractDesignFeatures(img)
@@ -16,21 +21,18 @@ def findCharacter(img, character_templates):
 
     match_size = 0
     character = []
-    matches_list = []
+    char_location = []
     for curr_character in lt.characters:
         curr_template = character_templates[curr_character]
         matches = bf.knnMatch(curr_template[1], img_features[1],k=2)
         verified_matches = []
         for match1, match2 in matches:
             if match1.distance < 0.7 * match2.distance:
-                verified_matches.append([match1])
-        match_size = len(verified_matches)
-        matches_list.append(match_size)
-        temp = cv2.drawMatchesKnn(character_templates['img' + curr_character],curr_template[0],img,img_features[0],verified_matches,None)
-        cv2.imshow("test",temp)
-        cv2.waitKey(0)
-        print(match_size)
-        if match_size > 20:
-            character.append(curr_character)
+                verified_matches.append(match1.trainIdx)
 
-    return character
+        match_size = len(verified_matches)
+        #temp = cv2.drawMatchesKnn(character_templates['img' + curr_character],curr_template[0],img,img_features[0],verified_matches,None)
+        if match_size > 20:
+            char_location.append((getCharacterLocation(img_features[0],verified_matches), curr_character))
+
+    return sorted(char_location)
