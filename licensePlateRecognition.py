@@ -13,7 +13,7 @@ def buildTemplates():
     return state_templates, symbol_templates
 
 
-def findMatches(img, state_templates):
+def findStateFast(img, state_templates):
     img_features = st.extractDesignFeatures(img)
 
     bf = cv2.BFMatcher()
@@ -92,6 +92,45 @@ def findState(img, state_templates):
     return state
 
 
+def findSymbolsFast(images, symbol_templates):
+    symbols = ''
+    for image in images:
+        image = cv2.imread(image)
+        img_features = st.extractDesignFeatures(image)
+        
+        bf = cv2.BFMatcher()
+        
+        match_size = 0
+        curr_symbol = ''
+        matches_list = []
+        loop_broken = 0
+        
+        for i in range(len(symbol_templates)):
+            curr_template = symbol_templates[syt.symbols[i]]
+            matches = bf.knnMatch(curr_template[1], symbol_templates[i],k=2)
+
+            # ratio test
+            verified_matches = []
+            for match1, match2 in matches:
+                if match1.distance < 0.7 * match2.distance:
+                    verified_matches.append([match1])
+
+            match_size = len(verified_matches)
+            curr_symbol = syt.symbols[i]
+            matches_list.append(match_size)
+            if match_size > 60:
+                loop_broken = 1
+                break
+
+        if loop_broken == 0:
+            match_size = max(matches_list)
+            curr_symbol = syt.symbols[matches_list.index(match_size)]
+
+        symbols += curr_symbol
+
+    return symbols
+
+
 def findSymbols(images, symbol_templates):
     symbols = ''
     for image in images:
@@ -133,7 +172,6 @@ def findSymbols(images, symbol_templates):
             match_size = len(list_pairs_matched_keypoints)
             curr_symbol = syt.symbols[i]
             matches_list.append(match_size)
-            print(matches_list)
             if match_size > 60:
                 loop_broken = 1
                 break
