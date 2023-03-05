@@ -1,3 +1,6 @@
+import random
+import string
+
 import cv2
 import numpy as np
 from buildSymbolTemplates import Image
@@ -11,10 +14,17 @@ def crop_image(img):
     img_cropped = img[int(top_y):int(bottom_y), :]
     return img_cropped
 
-def showImage(img):
-    cv2.imshow("img",img)
-    cv2.waitKey(0)
-def individualSymbols(image):
+def getStateNameFromPath(filePath):
+    return filePath.split("\\")[1].split("_")[0]
+def randomString(length=8):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for _ in range(length))
+
+def showImage(img, disabled=True):
+    if not disabled:
+        cv2.imshow("img",img)
+        cv2.waitKey(0)
+def individualSymbols(image, filePath=None):
 
     # crop image
     cropped_image = crop_image(image)
@@ -30,19 +40,20 @@ def individualSymbols(image):
 
     # create contours
     thresh_image = cv2.threshold(blurred_image, 110, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    dark_letter_image = cv2.bitwise_not(thresh_image)
     contours, _ = cv2.findContours(thresh_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     max_height = cropped_image.shape[0]
 
     showImage(thresh_image)
     # get bounding boxes from contour
-    filenames = {}
+    croppedLetters = []
     for i in range(len(contours)):
         x,y,w,h = cv2.boundingRect(contours[i])
-        padding = 15
+        padding = 10
         x = max(0, x - padding)
         y = max(0, y - padding)
-        w = min(thresh_image.shape[1] - x, w + padding * 2)
-        h = min(thresh_image.shape[0] - y, h + padding * 2)
+        w = min(dark_letter_image.shape[1] - x, w + padding * 2)
+        h = min(dark_letter_image.shape[0] - y, h + padding * 2)
 
         # cv2.rectangle(gray_image, (x, y), (x + w, y + h), (255,0,0), 4)
 
@@ -51,11 +62,16 @@ def individualSymbols(image):
         # to contain a symbol
         if h >= max_height * 0.75 and w >= max_height * 0.25:
             croppedImg = Image(np.zeros((h,w,3),dtype=np.uint8))
-            croppedImg.image[:, :, 0] = thresh_image[y:y + h, x:x + w ]
-            croppedImg.image[:, :, 1] = thresh_image[y:y + h, x:x + w ]
-            croppedImg.image[:, :, 2] = thresh_image[y:y + h, x:x + w ]
+            croppedImg.image[:, :, 0] = dark_letter_image[y:y + h, x:x + w ]
+            croppedImg.image[:, :, 1] = dark_letter_image[y:y + h, x:x + w ]
+            croppedImg.image[:, :, 2] = dark_letter_image[y:y + h, x:x + w ]
 
-            filenames[croppedImg] = x
+            croppedImg.location = x
+
+            croppedLetters.append(croppedImg)
             showImage(croppedImg.image)
+            if(filePath != None):
+                outputFile = "cropped_images_templates/" + getStateNameFromPath(filePath) +"_" + randomString(8) + ".jpg"
+                cv2.imwrite(outputFile, croppedImg.image)
 
-    return filenames
+    return croppedLetters

@@ -4,11 +4,12 @@ import os
 import cv2
 from buildStateTemplates import states
 
-PATH = "templates/symbol_templates/"
+PATH = "templates/symbol_templates-1/"
 
 class Image():
     def __init__(self, image):
         self.image = image
+        self.location = 0
 
 def extractDesignFeatures(img):
     '''

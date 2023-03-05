@@ -3,7 +3,7 @@ import numpy as np
 import buildStateTemplates as st
 import buildSymbolTemplates as syt
 
-
+DEBUG = False
 
 def buildTemplates():
     # create state templates
@@ -119,11 +119,11 @@ def get2FeatureMatches(des1,des2):
 def findSymbols(state, images, symbol_templates):
     if state not in symbol_templates.keys():
         print("No symbols found for state: " + state)
-        return '#' * len(images.keys())
+        return '#' * len(images)
     plateNumber = ''
     charLocation = []
     charTemplates = symbol_templates[state].keys()
-    for image in images.keys():
+    for image in images:
         img = image.image
         most_feature_matched = []
         img_1_features = st.extractDesignFeatures(img)
@@ -139,14 +139,14 @@ def findSymbols(state, images, symbol_templates):
 
             most_feature_matched.append((len(list_pairs_matched_keypoints),template.split("_")[2]))
 
-        # print(sorted(most_feature_matched, reverse=True))
+        if DEBUG:
+            print(sorted(most_feature_matched, reverse=True))
         # cv2.imshow("character",image.image)
         # cv2.waitKey(0)
         noMatches, character = sorted(most_feature_matched, reverse=True)[0]
         if noMatches>5:
-            charLocation.append((images[image], character))
-    
-    sorted(charLocation)
+            charLocation.append((image.location, character))
+    charLocation = sorted(charLocation)
     for _,character in charLocation:
         plateNumber += character
     return plateNumber
