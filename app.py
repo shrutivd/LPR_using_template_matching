@@ -37,6 +37,10 @@ class App:
             cv2.imshow("Plate Image",img)
             cv2.waitKey(0)
 
+    def getSegmentedImage(self, imagePath):
+        img = cv2.imread(imagePath)
+        croppedImage = td.individualSymbols(img)
+
     def printPlateDetails(self):
         # print license plate information
         print('---------------------------------------')
@@ -57,7 +61,8 @@ if __name__ == "__main__":
     path = 'test'
     file_list = glob.glob(path + '/*jpg')
     for file in file_list:
-        app.getPlateDetails(file, True, True)
+        # app.getPlateDetails(file, True, True)
+        app.getSegmentedImage(file)
 
 
 
