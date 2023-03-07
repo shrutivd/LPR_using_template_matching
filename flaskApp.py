@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+import newDriver as nd
 
 app = Flask(__name__)
 
@@ -8,6 +9,17 @@ def register():
 
 @app.route('/registered', methods = ['POST', 'GET'])
 def registered():
+    if request.method == "POST":
+       fname = request.form.get("firstName")
+       lname = request.form.get("lastName")
+       state = request.form.get("state")
+       lp = request.form.get("licensePlate")
+       email = request.form.get("email")
+       number = request.form.get("phone")
+       bday = request.form.get("birthday")
+
+       nd.registerNewDriver(state, lp, fname, lname, email, number, bday)
+       
     return render_template('frontend/registered.html')
 
 @app.route('/extract', methods = ['POST', 'GET'])

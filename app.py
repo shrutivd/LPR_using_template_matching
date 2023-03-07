@@ -23,18 +23,22 @@ def main(lp_img):
     # get letters/numbers
     cropped_symbols = td.individualSymbols(img)
     if args.fast:
-        symbols = pr.findSymbols(cropped_symbols, symbol_temp)
+        symbols = pr.findSymbolsFast(cropped_symbols, symbol_temp)
     else:
         symbols = pr.findSymbols(cropped_symbols, symbol_temp)
     # get driver's information
-    name = di.getDriverName(state, symbols)
+    # name, email, phone, bday = di.getDriverName(state, symbols)
+    print(symbols)
 
-    # print license plate information-
-    print('---------------------------------------')
-    print('State:', state)
-    print('License Plate:', symbols)
-    print("Driver's Name:", name)
-    print('---------------------------------------')
+    # # print license plate information
+    # print('---------------------------------------')
+    # print('State:', state)
+    # print('License Plate:', symbols)
+    # print("Driver's Name:", name)
+    # print("Driver's Email:", email)
+    # print("Driver's Phone Number:", phone)
+    # print("Driver's Date of Birth:", bday)
+    # print('---------------------------------------')
 
 
 if __name__ == "__main__":

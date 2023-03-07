@@ -1,4 +1,5 @@
 import cv2
+import random
 
 symbols = ['A', 'B', 'C', 'D', 'E', 'F',
                'G', 'H', 'I', 'J', 'K', 'L',
@@ -28,11 +29,9 @@ def createAllSymbolTemplates():
     """
     symbol_templates = {}
     for symbol in symbols:
-        symbol_image = []
         symbol_image = cv2.imread('templates/symbol_templates/' + symbol + '.jpg')
         symbol_template = extractDesignFeatures(symbol_image)
         symbol_templates[symbol] = symbol_template
-
 
     # return all state design tempates
     return symbol_templates

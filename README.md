@@ -3,6 +3,8 @@ The project contains logic that reads the license plate and returns the owner na
 
 To Run Application: $ python3 app.py <IMAGE_FILE_NAME>
 
+To Run a Faster Version of The Application: $ python3 app.py --fast <IMAGE_FILE_NAME>
+
 To Run Frontend: $ python3 flaskApp.py
 
 To Test Application: $ python3 test.py

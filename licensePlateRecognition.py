@@ -96,7 +96,33 @@ def findSymbolsFast(images, symbol_templates):
     symbols = ''
     for image in images:
         image = cv2.imread(image)
+
+        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        _, gray = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
+        cnts, _ = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+        # Generate mask
+        mask = np.ones(gray.shape)
+        mask = cv2.drawContours(mask, cnts, -1, 0, cv2.FILLED)
+        for i in range(len(mask)):
+            for j in range(len(mask[0])):
+                if mask[i][j] == 1.0:
+                    mask[i][j] = 0.0
+                elif mask[i][j] == 0.0:
+                    mask[i][j] = 1.0
+
+
+        # img_features = st.extractDesignFeatures(mask)
+
+        # cv2.imshow('mask', mask)
+        # cv2.waitKey(0)
+  
+        # # closing all open windows
+        # cv2.destroyAllWindows()
+
         img_features = st.extractDesignFeatures(image)
+
+
         
         bf = cv2.BFMatcher()
         
@@ -107,7 +133,7 @@ def findSymbolsFast(images, symbol_templates):
         
         for i in range(len(symbol_templates)):
             curr_template = symbol_templates[syt.symbols[i]]
-            matches = bf.knnMatch(curr_template[1], symbol_templates[i],k=2)
+            matches = bf.knnMatch(curr_template[1], img_features[1], k=2)
 
             # ratio test
             verified_matches = []
@@ -124,6 +150,7 @@ def findSymbolsFast(images, symbol_templates):
 
         if loop_broken == 0:
             match_size = max(matches_list)
+            print(match_size, matches_list)
             curr_symbol = syt.symbols[matches_list.index(match_size)]
 
         symbols += curr_symbol
