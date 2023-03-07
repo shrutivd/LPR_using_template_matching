@@ -63,8 +63,8 @@ if __name__ == "__main__":
     app = App()
     path = 'test'
     # file_list = glob.glob(path + '/*jpg')
-    file_list = ["test/Alaska_1.jpg", "test/Alaska_3.jpg", "test/Alaska_5.jpg", "test/Arizona_2.jpg",
-    "test/Arkansas_1.jpg", "test/Arkansas_3.jpg", "test/Arkansas_5.jpg", "test/Alaska_2.jpg",
+    #"test/Alaska_1.jpg", "test/Alaska_3.jpg", "test/Alaska_5.jpg",  "test/Arizona_2.jpg",
+    file_list = ["test/Alaska_1.jpg", "test/Alaska_3.jpg", "test/Alaska_5.jpg",  "test/Arizona_2.jpg","test/Arkansas_1.jpg", "test/Arkansas_3.jpg", "test/Arkansas_5.jpg", "test/Alaska_2.jpg",
     "test/Alaska_4.jpg", "test/Alaska_6.jpg", "test/Arizona_3.jpg",  "test/Arkansas_2.jpg",
     "test/Arkansas_4.jpg", "test/Arkansas_6.jpg"]
     for file in file_list:

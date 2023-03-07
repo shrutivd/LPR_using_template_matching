@@ -21,18 +21,20 @@ def extractDesignFeatures(img):
     sift = cv2.SIFT_create()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     canny = cv2.Canny(gray, 100, 300)
-    kernel = np.ones((3,3), np.uint8)
+    kernel = np.ones((3,3), np.uint8)  #3X3 is correct dont change it
     dilateEdges = cv2.dilate(canny, kernel, iterations=1)
     canny = cv2.Canny(dilateEdges, 100, 300)
-    dilateEdges = cv2.dilate(canny, kernel, iterations=2)
+    dilateEdges = cv2.dilate(canny, kernel, iterations=2) #2 7
     canny = cv2.Canny(dilateEdges, 100, 300)
-    dilateEdges = cv2.dilate(canny, kernel, iterations=1)
+    dilateEdges = cv2.dilate(canny, kernel, iterations=1) #1
     canny = cv2.Canny(dilateEdges, 100, 300)
-    dilateEdges = cv2.dilate(canny, kernel, iterations=1)
+    dilateEdges = cv2.dilate(canny, kernel, iterations=3) #3 7
+    dilateEdges = cv2.dilate(canny, kernel, iterations=1) ### works for 1
+    canny = cv2.Canny(dilateEdges, 100, 300) ### works for 1
     invertedImg = cv2.bitwise_not(dilateEdges)
     kp, des = sift.detectAndCompute(invertedImg, None)
-    # cv2.imshow("img", invertedImg)
-    # cv2.waitKey(0)
+    #cv2.imshow("img", invertedImg)
+    #cv2.waitKey(0)
 
     # return state templates
     return (kp, des)
