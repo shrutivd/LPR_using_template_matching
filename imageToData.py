@@ -5,7 +5,8 @@ import cv2
 import numpy as np
 from buildSymbolTemplates import Image
 
-
+#Function to crop the whole license plate such that only character section of
+#number plate is kept for further use
 def crop_image(img):
     height_scale_measure = 0.53
     center_x, center_y = img.shape[1] / 2, img.shape[0] / 2
@@ -14,25 +15,34 @@ def crop_image(img):
     img_cropped = img[int(top_y):int(bottom_y), :]
     return img_cropped
 
+#get only the name of state from the name of file
+#this function is used to rename croped characters
 def getStateNameFromPath(filePath):
     return filePath.split("\\")[1].split("_")[0]
+
+#function to generate random numbers
+#This function also is used to rename croped charcters
 def randomString(length=8):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for _ in range(length))
 
+#function to display image
 def showImage(img, disabled=True):
     if not disabled:
         cv2.imshow("img",img)
         cv2.waitKey(0)
+
+#
 def individualSymbols(image, filePath=None):
 
-    # crop image
+    # crop the complere image of number plate to focus just
+    # on area where characters are present
     cropped_image = crop_image(image)
 
     # convert image to grayscale
     gray_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
 
-    # blur image
+    # Gaussian Blur to remove the noise from the image
     blurred_image = cv2.GaussianBlur(gray_image, (5, 5), 25)
     showImage(blurred_image)
 

@@ -3,7 +3,7 @@ import numpy as np
 import buildStateTemplates as st
 import buildSymbolTemplates as syt
 
-DEBUG = False
+DEBUG = True
 
 def buildTemplates():
     # create state templates
@@ -126,7 +126,7 @@ def findSymbols(state, images, symbol_templates):
     for image in images:
         img = image.image
         most_feature_matched = []
-        img_1_features = st.extractDesignFeatures(img)
+        img_1_features = syt.extractDesignFeatures(img)
         for template in charTemplates:
             img_2_features = symbol_templates[state][template]
             matches = get2FeatureMatches(img_1_features[1], img_2_features[1])
