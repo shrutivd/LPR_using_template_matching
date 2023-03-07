@@ -11,14 +11,15 @@
     <br>
     <div class="justify-content-center mx-auto col-3">
         <h4 class="text-center">License Plate Information</h4>
-        <img src="{{ url_for('static', filename='images/1.jpg') }}" alt="License Plate" width="350" height="200">
+        <img src="{{ url_for('static', filename='images/' + file) }}" alt="License Plate" width="350" height="200">
         <div class="">
             <br>
-            <p>Name:</p>
-            <p>Email:</p>
-            <p>Phone Number:</p>
-            <p>License Plate State:</p>
-            <p>License Plate:</p>
+            <p>Name: {{ name }}</p>
+            <p>Date of Birth: {{ bday }}</p>
+            <p>License Plate State: {{ state }}</p>
+            <p>License Plate: {{ symbols }}</p>
+            <p>Email: {{ email }} </p>
+            <p>Phone Number: {{ phone }}</p>
         </div>
     </div>
     <div class="text-center">

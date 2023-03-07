@@ -14,7 +14,11 @@
         <form action="/extracted" method="post" class="form-group" >
             <div class="mb-3">
                 <label for="formFile" class="form-label">Select an image of a license plate: </label>
-                <input class="form-control" type="file" id="formFile" required>
+                <input class="form-control" type="file" name="file" id="formFile" accept="image/gif, image/jpeg, image/png" required>
+            </div>
+            <div class="mb-3">
+                <input type="checkbox" class="custom-control-input" id="customCheck" name="fast" checked>
+                <label class="custom-control-label" for="customCheck">Extract the license plate information faster</label>
             </div>
             <div class="text-center">
                 <button type="reset" onClick="window.location.href = '/';" class="btn btn-secondary">Back</button>

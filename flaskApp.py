@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request
 import newDriver as nd
+import app
 
-app = Flask(__name__)
+flaskApp = Flask(__name__)
 
-@app.route('/register', methods = ['POST', 'GET'])
+@flaskApp.route('/register', methods = ['POST', 'GET'])
 def register():
     return render_template('frontend/register.html')
 
-@app.route('/registered', methods = ['POST', 'GET'])
+@flaskApp.route('/registered', methods = ['POST', 'GET'])
 def registered():
     if request.method == "POST":
        fname = request.form.get("firstName")
@@ -22,17 +23,22 @@ def registered():
        
     return render_template('frontend/registered.html')
 
-@app.route('/extract', methods = ['POST', 'GET'])
+@flaskApp.route('/extract', methods = ['POST', 'GET'])
 def extract():
     return render_template('frontend/extract.html')
 
-@app.route('/extracted', methods = ['POST', 'GET'])
+@flaskApp.route('/extracted', methods = ['POST', 'GET'])
 def extracted():
-    return render_template('frontend/extracted.html')
+    if request.method == "POST":
+        file = request.form.get("file")
+        fast = request.form.get("fast")
+        name, state, symbols, email, phone, bday = app.mainFrontend('static/images/' + file, fast)
 
-@app.route('/')
+    return render_template('frontend/extracted.html', name=name, bday=bday, state=state, symbols=symbols, email=email, phone=phone, file=file)
+
+@flaskApp.route('/')
 def home():
     return render_template('frontend/home.html')
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=5002)
+    flaskApp.run(host='127.0.0.1', port=5002)
