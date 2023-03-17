@@ -20,7 +20,7 @@ class App:
     def getPlateDetails(self, imagePath, printDetails=None, showImage=None):
         img = cv2.imread(imagePath)
         self.state = pr.findState(img, self.state_temp)
-        croppedLetters = td.individualSymbols(img)
+        croppedLetters = td.individualSymbols(img, imagePath)
         self.symbols = pr.findSymbols(self.state, croppedLetters, self.symbol_temp)
         try:
             self.driverName = di.getDriverName(self.state, self.symbols)
@@ -37,12 +37,9 @@ class App:
             cv2.imshow("Plate Image",img)
             cv2.waitKey(0)
 
-    def getSegmentedImages(self, imagePath, saveCroppedImages=False):
+    def getSegmentedImages(self, imagePath):
         img = cv2.imread(imagePath)
-        if saveCroppedImages:
-            td.individualSymbols(img, imagePath)
-        else:
-            td.individualSymbols(img)
+        td.individualSymbols(img, imagePath, True)
 
     def printPlateDetails(self):
         # print license plate information
@@ -62,14 +59,13 @@ class App:
 if __name__ == "__main__":
     app = App()
     path = 'test'
-    # file_list = glob.glob(path + '/*jpg')
-    #"test/Alaska_1.jpg", "test/Alaska_3.jpg", "test/Alaska_5.jpg",  "test/Arizona_2.jpg",
-    file_list = ["test/Alaska_1.jpg", "test/Alaska_3.jpg", "test/Alaska_5.jpg",  "test/Arizona_2.jpg","test/Arkansas_1.jpg", "test/Arkansas_3.jpg", "test/Arkansas_5.jpg", "test/Alaska_2.jpg",
-    "test/Alaska_4.jpg", "test/Alaska_6.jpg", "test/Arizona_3.jpg",  "test/Arkansas_2.jpg",
-    "test/Arkansas_4.jpg", "test/Arkansas_6.jpg"]
+    file_list = glob.glob(path + '/*jpg')
+    # file_list = ["test/Alaska_1.jpg", "test/Alaska_3.jpg", "test/Alaska_5.jpg",  "test/Arizona_2.jpg","test/Arkansas_1.jpg", "test/Arkansas_3.jpg", "test/Arkansas_5.jpg", "test/Alaska_2.jpg",
+    # "test/Alaska_4.jpg", "test/Alaska_6.jpg", "test/Arizona_3.jpg",  "test/Arkansas_2.jpg",
+    # "test/Arkansas_4.jpg", "test/Arkansas_6.jpg"]
     for file in file_list:
-        app.getPlateDetails(file, True, True)
-        # app.getSegmentedImages(file)
+        # app.getPlateDetails(file, True, True)
+        app.getSegmentedImages(file)
 
 
 

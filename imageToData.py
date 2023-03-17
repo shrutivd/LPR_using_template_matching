@@ -7,11 +7,27 @@ from buildSymbolTemplates import Image
 
 #Function to crop the whole license plate such that only character section of
 #number plate is kept for further use
-def crop_image(img):
+
+cropping_characteristics = {
+    "NewHampshire": (1.7, 2.4),
+    "California": (2.4, 1.5),
+    "Nevada": (2.4, 1.5),
+    "Utah": (2.4, 1.5),
+    "Washington": (2.4, 1.5),
+    "WestVirginia": (2.4, 1.5),
+    "_": (2.0, 1.8)
+}
+def crop_image(img, filePath):
+    state_name = filePath.split("\\")[1].split('_')[0]
+    if state_name in cropping_characteristics.keys():
+        top, bottom = cropping_characteristics[state_name]
+    else:
+        top, bottom = cropping_characteristics["_"]
+
     height_scale_measure = 0.53
-    center_x, center_y = img.shape[1] / 2, img.shape[0] / 2
+    center_y = img.shape[0] / 2
     height_scaled = img.shape[0] * height_scale_measure
-    top_y, bottom_y = center_y - height_scaled / 2, center_y + height_scaled / 2
+    top_y, bottom_y = center_y - height_scaled / top, center_y + height_scaled / bottom
     img_cropped = img[int(top_y):int(bottom_y), :]
     return img_cropped
 
@@ -33,11 +49,11 @@ def showImage(img, disabled=True):
         cv2.waitKey(0)
 
 #
-def individualSymbols(image, filePath=None):
+def individualSymbols(image, filePath, generateCroppedImage=False):
 
     # crop the complere image of number plate to focus just
     # on area where characters are present
-    cropped_image = crop_image(image)
+    cropped_image = crop_image(image, filePath)
 
     # convert image to grayscale
     gray_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
@@ -49,7 +65,7 @@ def individualSymbols(image, filePath=None):
     # showImage(edges)
 
     # create contours
-    thresh_image = cv2.threshold(blurred_image, 110, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    thresh_image = cv2.threshold(blurred_image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
     dark_letter_image = cv2.bitwise_not(thresh_image)
     contours, _ = cv2.findContours(thresh_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     max_height = cropped_image.shape[0]
@@ -80,7 +96,7 @@ def individualSymbols(image, filePath=None):
 
             croppedLetters.append(croppedImg)
             showImage(croppedImg.image)
-            if(filePath != None):
+            if(generateCroppedImage):
                 outputFile = "cropped_images_templates/" + getStateNameFromPath(filePath) +"_" + randomString(8) + ".jpg"
                 cv2.imwrite(outputFile, croppedImg.image)
 

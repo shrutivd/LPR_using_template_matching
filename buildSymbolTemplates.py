@@ -28,9 +28,7 @@ def extractDesignFeatures(img):
     canny = cv2.Canny(dilateEdges, 100, 300)
     dilateEdges = cv2.dilate(canny, kernel, iterations=1) #1
     canny = cv2.Canny(dilateEdges, 100, 300)
-    dilateEdges = cv2.dilate(canny, kernel, iterations=3) #3 7
     dilateEdges = cv2.dilate(canny, kernel, iterations=1) ### works for 1
-    canny = cv2.Canny(dilateEdges, 100, 300) ### works for 1
     invertedImg = cv2.bitwise_not(dilateEdges)
     kp, des = sift.detectAndCompute(invertedImg, None)
     #cv2.imshow("img", invertedImg)
