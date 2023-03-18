@@ -21,19 +21,29 @@ def mainFrontend(lp_img, fast=False):
     else:
         symbols = pr.findSymbols(state, cropped_symbols, symbol_temp)
     # get driver's information
-    name, email, phone, bday = di.getDriverName(state, symbols)
+    try:
+        name, email, phone, bday = di.getDriverName(state, symbols)
 
-    # print license plate information
-    print('---------------------------------------')
-    print("Driver's Name:", name)
-    print("Driver's Date of Birth:", bday)
-    print('State:', state)
-    print('License Plate:', symbols)
-    print("Driver's Email:", email)
-    print("Driver's Phone Number:", phone)
-    print('---------------------------------------')
+        # print license plate information
+        print('---------------------------------------')
+        print("Driver's Name:", name)
+        print("Driver's Date of Birth:", bday)
+        print('State:', state)
+        print('License Plate:', symbols)
+        print("Driver's Email:", email)
+        print("Driver's Phone Number:", phone)
+        print('---------------------------------------')
 
-    return name, state, symbols, email, phone, bday
+        return [name, state, symbols, email, phone, bday]
+    except:
+        # print license plate information
+        print('---------------------------------------')
+        print('Match not found')
+        print('State:', state)
+        print('License Plate:', symbols)
+        print('---------------------------------------')
+
+        return [state, symbols]
 
 def main(lp_img):
     parser = argparse.ArgumentParser()
