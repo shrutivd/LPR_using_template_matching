@@ -92,121 +92,84 @@ def findState(img, state_templates):
     return state
 
 
-def findSymbolsFast(images, symbol_templates):
-    symbols = ''
+def findSymbolsFast(state, images, symbol_templates):
+    if state not in symbol_templates.keys():
+        state = "_"
+    plateNumber = ''
+    charLocation = []
+    charTemplates = symbol_templates[state].keys()
+    bf = cv2.BFMatcher()
     for image in images:
-        image = cv2.imread(image)
+        img = image.image
+        most_feature_matched = []
+        img_1_features = syt.extractDesignFeatures(img)
+        for template in charTemplates:
+            img_2_features = symbol_templates[state][template]
+            matches = bf.knnMatch(img_1_features[1], img_2_features[1], k=2)
 
-        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        _, gray = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
-        cnts, _ = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-        # Generate mask
-        mask = np.ones(gray.shape)
-        mask = cv2.drawContours(mask, cnts, -1, 0, cv2.FILLED)
-        for i in range(len(mask)):
-            for j in range(len(mask[0])):
-                if mask[i][j] == 1.0:
-                    mask[i][j] = 0.0
-                elif mask[i][j] == 0.0:
-                    mask[i][j] = 1.0
-
-
-        # img_features = st.extractDesignFeatures(mask)
-
-        # cv2.imshow('mask', mask)
-        # cv2.waitKey(0)
-  
-        # # closing all open windows
-        # cv2.destroyAllWindows()
-
-        img_features = st.extractDesignFeatures(image)
-
-
-        
-        bf = cv2.BFMatcher()
-        
-        match_size = 0
-        curr_symbol = ''
-        matches_list = []
-        loop_broken = 0
-        
-        for i in range(len(symbol_templates)):
-            curr_template = symbol_templates[syt.symbols[i]]
-            matches = bf.knnMatch(curr_template[1], img_features[1], k=2)
-
-            # ratio test
-            verified_matches = []
-            for match1, match2 in matches:
-                if match1.distance < 0.7 * match2.distance:
-                    verified_matches.append([match1])
-
-            match_size = len(verified_matches)
-            curr_symbol = syt.symbols[i]
-            matches_list.append(match_size)
-            if match_size > 60:
-                loop_broken = 1
-                break
-
-        if loop_broken == 0:
-            match_size = max(matches_list)
-            print(match_size, matches_list)
-            curr_symbol = syt.symbols[matches_list.index(match_size)]
-
-        symbols += curr_symbol
-
-    return symbols
-
-
-def findSymbols(images, symbol_templates):
-    symbols = ''
-    for image in images:
-        image = cv2.imread(image)
-        img_features = st.extractDesignFeatures(image)
-        match_size = 0
-        curr_symbol = ''
-        matches_list = []
-        loop_broken = 0
-        
-        for i in range(len(symbol_templates)):
-            keypoint_matches = {}
-            curr_template = symbol_templates[syt.symbols[i]]
-            for j in range(len(curr_template[1])):
-                dists = []
-                dist_dict = {}
-                matches = []
-                for k in range(len(img_features[1])):
-                    dist = np.linalg.norm(curr_template[1][j] - img_features[1][k])
-                    dists.append(dist)
-                    dist_dict[dist] = [img_features[0][k].pt[0], img_features[0][k].pt[1], dist]
-
-                # add two shortest distances to matches
-                matches.append(dist_dict[min(dists)])
-                dists.remove(min(dists))
-                matches.append(dist_dict[min(dists)])
-                keypoint_matches[curr_template[0][j]] = matches
-
-            # ratio test
             list_pairs_matched_keypoints = []
-            for point in curr_template[0]:
-                p2 = keypoint_matches[point][0]
-                p3 = keypoint_matches[point][1]
-                if p2[2] < p3[2] * 0.7:
-                    list_pairs_matched_keypoints.append(
-                        [[point.pt[0], point.pt[1]], [p2[0], p2[1]]])
+            for m1, m2 in matches:
+                if m1.distance < m2.distance * 0.75:
+                    list_pairs_matched_keypoints.append([m1])
 
+            most_feature_matched.append((len(list_pairs_matched_keypoints),template.split("_")[2]))
 
-            match_size = len(list_pairs_matched_keypoints)
-            curr_symbol = syt.symbols[i]
-            matches_list.append(match_size)
-            if match_size > 60:
-                loop_broken = 1
-                break
+        noMatches, character = sorted(most_feature_matched, reverse=True)[0]
+        if noMatches>5:
+            charLocation.append((image.location, character))
+    charLocation = sorted(charLocation)
+    for _,character in charLocation:
+        plateNumber += character
+    return plateNumber
 
-        if loop_broken == 0:
-            match_size = max(matches_list)
-            curr_symbol = syt.symbols[matches_list.index(match_size)]
+def get2FeatureMatches(des1,des2):
+    matches = []
+    for i, v1 in enumerate(des1):
+        dmin = 10000
+        d2min = 10000
+        kp1_idx = None
+        kp2_idx = None
+        for j, v2 in enumerate(des2):
+            d = np.linalg.norm(v1-v2)
+            if d < dmin:
+                d2min = dmin
+                dmin = d
+                kp1_idx = i
+                kp2_idx = j
+            elif dmin < d and d2min > d:
+                d2min = d
 
-        symbols += curr_symbol
+        m = {"dmin": dmin, "d2min": d2min, "kp1_idx": kp1_idx, "kp2_idx": kp2_idx}
+        matches.append(m)
 
-    return symbols
+    return matches
+
+def findSymbols(state, images, symbol_templates):
+    if state not in symbol_templates.keys():
+        state = "_"
+    plateNumber = ''
+    charLocation = []
+    charTemplates = symbol_templates[state].keys()
+    for image in images:
+        img = image.image
+        most_feature_matched = []
+        img_1_features = syt.extractDesignFeatures(img)
+        for template in charTemplates:
+            img_2_features = symbol_templates[state][template]
+            matches = get2FeatureMatches(img_1_features[1], img_2_features[1])
+
+            list_pairs_matched_keypoints = []
+            for m in matches:
+                if (m['dmin'] / m['d2min']) < 0.75:
+                    list_pairs_matched_keypoints.append([img_1_features[0][m['kp1_idx']].pt,
+                                                         img_2_features[0][m['kp2_idx']].pt])
+
+            most_feature_matched.append((len(list_pairs_matched_keypoints),template.split("_")[2]))
+
+        noMatches, character = sorted(most_feature_matched, reverse=True)[0]
+        if noMatches>5:
+            charLocation.append((image.location, character))
+    charLocation = sorted(charLocation)
+    for _,character in charLocation:
+        plateNumber += character
+    return plateNumber

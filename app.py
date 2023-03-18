@@ -1,8 +1,6 @@
 import cv2
 import sys
 import argparse
-import buildStateTemplates as st
-import buildSymbolTemplates as syt
 import licensePlateRecognition as pr
 import extractDriverInformation as di
 import imageToData as td
@@ -17,11 +15,11 @@ def mainFrontend(lp_img, fast=False):
     else:
         state = pr.findState(img, state_temp)
     # get letters/numbers
-    cropped_symbols = td.individualSymbols(img)
+    cropped_symbols = td.individualSymbols(img, state)
     if fast:
-        symbols = pr.findSymbolsFast(cropped_symbols, symbol_temp)
+        symbols = pr.findSymbolsFast(state, cropped_symbols, symbol_temp)
     else:
-        symbols = pr.findSymbols(cropped_symbols, symbol_temp)
+        symbols = pr.findSymbols(state, cropped_symbols, symbol_temp)
     # get driver's information
     name, email, phone, bday = di.getDriverName(state, symbols)
 
@@ -51,11 +49,11 @@ def main(lp_img):
     else:
         state = pr.findState(img, state_temp)
     # get letters/numbers
-    cropped_symbols = td.individualSymbols(img)
+    cropped_symbols = td.individualSymbols(img, state)
     if args.fast:
-        symbols = pr.findSymbolsFast(cropped_symbols, symbol_temp)
+        symbols = pr.findSymbolsFast(state, cropped_symbols, symbol_temp)
     else:
-        symbols = pr.findSymbols(cropped_symbols, symbol_temp)
+        symbols = pr.findSymbols(state, cropped_symbols, symbol_temp)
     # get driver's information
     name, email, phone, bday = di.getDriverName(state, symbols)
 
