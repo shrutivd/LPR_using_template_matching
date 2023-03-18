@@ -32,9 +32,12 @@ def extracted():
     if request.method == "POST":
         file = request.form.get("file")
         fast = request.form.get("fast")
-        name, state, symbols, email, phone, bday = app.mainFrontend('static/images/' + file, fast)
-
-    return render_template('frontend/extracted.html', name=name, bday=bday, state=state, symbols=symbols, email=email, phone=phone, file=file)
+        info_li = app.mainFrontend('static/images/' + file, fast)
+        # name, state, symbols, email, phone, bday
+        if len(info_li) > 2:
+            return render_template('frontend/extracted.html', name=info_li[0], bday=info_li[5], state=info_li[1], symbols=info_li[2], email=info_li[3], phone=info_li[4], file=file)
+        else:
+            return render_template('frontend/almostextracted.html', state=info_li[0], symbols=info_li[1], file=file)
 
 @flaskApp.route('/')
 def home():
